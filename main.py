@@ -1,15 +1,34 @@
+import os
+from decouple import config
 from fastapi import FastAPI
 from pydantic import BaseModel
+# import discord
+import lib
+
+if __name__ == '__main__':
+    print('era pra entrar aqui')
+    lib.run_bot()
+# from dotenv import load_dotenv
+
+# load_dotenv()
+# intents = discord.Intents.default()
+# intents.message_content = True
+# intents.members = True
+
+# client = discord.Client(intents=intents)
+# client.run(os.getenv('DISCORD_TOKEN'))
 
 app = FastAPI()
-
+# lib.connect()
 class Msg(BaseModel):
     msg: str
 
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World. Welcome to FastAPI!"}
+    response = lib.getCompletion('quanto é 2 + 2')
+    return {'msg': response}
+    # return {"message": "Hello World. Welcome to FastAPI!"}
 
 
 @app.get("/path")
