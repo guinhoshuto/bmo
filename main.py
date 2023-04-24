@@ -3,11 +3,11 @@ from decouple import config
 from fastapi import FastAPI
 from pydantic import BaseModel
 # import discord
-import lib
+import utils
 
 if __name__ == '__main__':
     print('era pra entrar aqui')
-    lib.run_bot()
+    utils.run_bot()
 # from dotenv import load_dotenv
 
 # load_dotenv()
@@ -26,7 +26,7 @@ class Msg(BaseModel):
 
 @app.get("/")
 async def root():
-    response = lib.getCompletion('quanto é 2 + 2')
+    response = utils.getCompletion('quanto é 2 + 2')
     return {'msg': response}
     # return {"message": "Hello World. Welcome to FastAPI!"}
 
