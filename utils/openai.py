@@ -1,6 +1,7 @@
 import os
 import openai
 from dotenv import load_dotenv
+from rich import print
 
 load_dotenv()
 
@@ -11,7 +12,8 @@ def getCompletion(prompt, system=None):
         model="gpt-3.5-turbo",
         messages=getMessage(prompt, system)
     )
-    return completion
+    c = completion.choices[0].message.content
+    return c
 
 def getMessage(prompt, system=None):
     messages = []
