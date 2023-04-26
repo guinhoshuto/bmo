@@ -1,6 +1,7 @@
 import os
 import discord
 from discord import app_commands
+import utils
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -29,7 +30,13 @@ async def on_message(message):
 async def run_bot():
     await bmo.start(os.getenv('DISCORD_TOKEN'))
 
+# --------
+# commands
+# --------
+
 @tree.command(name="gpt")
-@app_commands.describe(prompt="fala ai")
-async def gpt(interaction, prompt: str):
-    await interaction.response.send_message(prompt)
+@app_commands.describe(prompt="fala ai", system="quem vc pensa que é?")
+async def gpt(interaction, prompt: str, system: str):
+    await interaction.response.send_message('pera ai, patrão')
+    response = await utils.getCompletion(prompt, system) 
+    await interaction.response.edit_message(response)
