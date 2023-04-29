@@ -7,12 +7,13 @@ load_dotenv()
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
-def getCompletion(prompt, system=None):
+async def getCompletion(prompt, system=None):
     completion = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=getMessage(prompt, system)
     )
     c = completion.choices[0].message.content
+    print(c)
     return c
 
 def getMessage(prompt, system=None):

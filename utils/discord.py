@@ -1,6 +1,7 @@
 import os
 import discord
 from discord import app_commands
+import asyncio
 import utils
 from rich import print
 from dotenv import load_dotenv
@@ -37,8 +38,11 @@ async def run_bot():
 
 @tree.command(name="gpt")
 @app_commands.describe(prompt="fala ai", system="quem vc pensa que é?")
-async def gpt(interaction, prompt: str, system: str):
+async def gpt(interaction, prompt:str, system: str = None):
     await interaction.response.defer(thinking=True)
+    # thread = await interaction.response.create_thread(
+    #     name=f"{prompt}",
+    #     auto_archive_duration=60
+    # )
     response = await utils.getCompletion(prompt, system) 
-    # await interaction.followup.send(response.choices[0].message.content)
     await interaction.followup.send(response)
