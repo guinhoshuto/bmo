@@ -56,6 +56,12 @@ async def babel(interaction, prompt: str, lang: str = "english", mood: str = "no
         f'I want you to act as an {lang} translator, spelling corrector and improver. I will speak to you in brazilian portuguese and you will translate it and answer in the corrected and improved version of my text, in {lang}. I want you to only reply the correction, the improvements and nothing else, do not write explanations and make it in a {mood} way. My first sentence is "{prompt}"')
     await interaction.followup.send(response.choices[0].message.content)
 
+@tree.command(name="search")
+@app_commands.describe(search="lmgfy")
+async def search(interaction, search: str):
+    await interaction.response.defer(thinking=True)
+    response = utils.searchForDiscord(search)
+    await interaction.followup.send(response)
 
 
 
