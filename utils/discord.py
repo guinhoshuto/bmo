@@ -40,9 +40,22 @@ async def run_bot():
 @app_commands.describe(prompt="fala ai", system="quem vc pensa que é?")
 async def gpt(interaction, prompt:str, system: str = None):
     await interaction.response.defer(thinking=True)
-    # thread = await interaction.response.create_thread(
+    # await interaction.response.send('oi')
+    # thread = await interaction.original_response().create_thread(
     #     name=f"{prompt}",
     #     auto_archive_duration=60
     # )
     response = await utils.getCompletion(prompt, system) 
-    await interaction.followup.send(response)
+    await interaction.followup.send(response.choices[0].message.content)
+
+@tree.command(name="babel")
+@app_commands.describe(prompt="diga lá", lang="english or japanese", mood="in a ... way")
+async def babel(interaction, prompt: str, lang: str = "english", mood: str = "normal"):
+    await interaction.response.defer(thinking=True)
+    response = await utils.getCompletion(
+        f'I want you to act as an {lang} translator, spelling corrector and improver. I will speak to you in brazilian portuguese and you will translate it and answer in the corrected and improved version of my text, in {lang}. I want you to only reply the correction, the improvements and nothing else, do not write explanations and make it in a {mood} way. My first sentence is "{prompt}"')
+    await interaction.followup.send(response.choices[0].message.content)
+
+
+
+

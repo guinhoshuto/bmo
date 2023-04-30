@@ -12,9 +12,8 @@ async def getCompletion(prompt, system=None):
         model="gpt-3.5-turbo",
         messages=getMessage(prompt, system)
     )
-    c = completion.choices[0].message.content
-    print(c)
-    return c
+    # c = completion.choices[0].message.content
+    return completion
 
 def getMessage(prompt, system=None):
     messages = []
