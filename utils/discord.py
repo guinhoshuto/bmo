@@ -32,36 +32,56 @@ async def on_message(message):
 async def run_bot():
     await bmo.start(os.getenv('DISCORD_TOKEN'))
 
+async def get_thread_history(channel):
+    async for message in channel.history(limit=100):
+        print(message.content)
+
 # --------
 # commands
 # --------
 
+@tree.command(name="test")
+async def test(interaction):
+    await get_thread_history(interaction.channel)
+    await interaction.followup.send('oi')
+
+
 @tree.command(name="gpt")
 @app_commands.describe(prompt="fala ai", system="quem vc pensa que é?")
 async def gpt(interaction, prompt:str, system: str = None):
+    history=None
+    # print(interaction.channel.type)
     await interaction.response.defer(thinking=True)
-    # await interaction.response.send('oi')
-    # thread = await interaction.original_response().create_thread(
-    #     name=f"{prompt}",
-    #     auto_archive_duration=60
-    # )
-    response = await utils.getCompletion(prompt, system) 
-    await interaction.followup.send(response.choices[0].message.content)
+    if interaction.channel.type == discord.ChannelType.public_thread:
+        history = get_thread_history(interaction.channel_id)
+    response = await utils.get_completion(prompt, system=system, history=history) 
+    await interaction.followup.send(f"**Prompt**: {prompt}")
+    await interaction.followup.send(response["message"])
 
 @tree.command(name="babel")
 @app_commands.describe(prompt="diga lá", lang="english or japanese", mood="in a ... way")
 async def babel(interaction, prompt: str, lang: str = "english", mood: str = "normal"):
     await interaction.response.defer(thinking=True)
-    response = await utils.getCompletion(
-        f'I want you to act as an {lang} translator, spelling corrector and improver. I will speak to you in brazilian portuguese and you will translate it and answer in the corrected and improved version of my text, in {lang}. I want you to only reply the correction, the improvements and nothing else, do not write explanations and make it in a {mood} way. My first sentence is "{prompt}"')
-    await interaction.followup.send(response.choices[0].message.content)
+    response = await utils.get_completion(
+        f"""I want you to act as an {lang} translator, \
+            spelling corrector and improver. \
+            Translate the text delimited by triple backticks. \
+            It is in brazilian portuguese and you will translate it \
+            and answer in the corrected and improved version of my text, \
+            in {lang}. I want you to only reply the correction, \
+            the improvements and nothing else, \ 
+            do not write explanations and make it in a {mood} way. \ 
+            My first sentence is ```{prompt}```""")
+    await interaction.followup.send(response["message"])
 
 @tree.command(name="search")
 @app_commands.describe(search="lmgfy")
 async def search(interaction, search: str):
     await interaction.response.defer(thinking=True)
-    response = utils.searchForDiscord(search)
-    await interaction.followup.send(response)
+    response = utils.search_for_discord(search)
+    print(response["items"])
+    await interaction.followup.send(response["message"])
+    # await interaction.followup.send(view=view)
 
 
 

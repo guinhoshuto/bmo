@@ -10,17 +10,16 @@ params = {
     "cx": os.getenv('SEARCH_ENGINE_ID'),
 }
 
-def getSearchResults(q):
+def get_search_results(q):
     params["q"] = q
     response = requests.get("https://www.googleapis.com/customsearch/v1", params=params)
     items = response.json().get("items")
     # print(response.json())
     return items
 
-def searchForDiscord(q, lucky=False):
-    response = ''
-    items = getSearchResults(q)
-    # print(items)
+def search_for_discord(q):
+    message = ''
+    items = get_search_results(q)
     for i, item in enumerate(items):
-        response += f"{i} - [{item.get('title')} - {item.get('displayLink')}](<{item.get('link')}>) \n"
-    return response
+        message += f"{i} - [{item.get('title')} - **{item.get('displayLink')}**](<{item.get('link')}>) \n"
+    return {"message": message, "items": items}

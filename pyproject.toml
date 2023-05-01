@@ -16,6 +16,7 @@ discord-py = "^2.2.2"
 asyncio = "^3.4.3"
 rich = "^13.3.4"
 requests = "^2.29.0"
+beautifulsoup4 = "^4.12.2"
 
 [tool.poetry.dev-dependencies]
 
