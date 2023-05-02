@@ -22,7 +22,8 @@ async def get_completion(prompt, system=None, history=None):
 def get_message(prompt, system=None, history=None):
     messages = []
     if history:
-        print('uai')
+        print('---history---')
+        print(history)
     if system:
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})

@@ -33,8 +33,10 @@ async def run_bot():
     await bmo.start(os.getenv('DISCORD_TOKEN'))
 
 async def get_thread_history(channel):
+    history = []
     async for message in channel.history(limit=100):
-        print(message.content)
+        history.append(message.content)
+    return history
 
 # --------
 # commands
@@ -54,6 +56,8 @@ async def gpt(interaction, prompt:str, system: str = None):
     await interaction.response.defer(thinking=True)
     if interaction.channel.type == discord.ChannelType.public_thread:
         history = get_thread_history(interaction.channel_id)
+    print('---pp--')
+    print(history)
     response = await utils.get_completion(prompt, system=system, history=history) 
     await interaction.followup.send(f"**Prompt**: {prompt}")
     await interaction.followup.send(response["message"])
