@@ -5,10 +5,20 @@ from rich import print
 
 load_dotenv()
 
+helicone_api_key = os.getenv('HELICONE_API_KEY')
 openai.api_key = os.getenv('OPENAI_API_KEY')
+openai.api_base = "https://oai.hconeai.com/v1"
 
-async def get_completion(prompt, system=None, history=None):
+async def get_completion(prompt, channelId, userId, system=None, history=None):
+    print(channelId, userId)
     completion = openai.ChatCompletion.create(
+        headers={
+            "Helicone-Auth": "Bearer " + helicone_api_key,
+            "Helicone-User-Id": str(userId),
+            "Helicone-Property-Channel": str(channelId),
+            "Helicone-Property-User": str(userId),
+             "Helicone-Cache-Enabled": "true",
+        },
         # model="gpt-3.5-turbo",
         model="gpt-4",
         messages=get_message(prompt, system, history)

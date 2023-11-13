@@ -56,9 +56,8 @@ async def gpt(interaction, prompt:str, system: str = None):
     await interaction.response.defer(thinking=True)
     if interaction.channel.type == discord.ChannelType.public_thread:
         history = get_thread_history(interaction.channel_id)
-    print('---pp--')
     print(history)
-    response = await utils.get_completion(prompt, system=system, history=history) 
+    response = await utils.get_completion(prompt, interaction.channel_id, interaction.user, system=system, history=history) 
     await interaction.followup.send(f"**Prompt**: {prompt}")
     await interaction.followup.send(response["message"])
 
@@ -75,7 +74,7 @@ async def babel(interaction, prompt: str, lang: str = "english", mood: str = "no
             in {lang}. I want you to only reply the correction, \
             the improvements and nothing else, \ 
             do not write explanations and make it in a {mood} way. \ 
-            My first sentence is ```{prompt}```""")
+            My first sentence is ```{prompt}```""", interaction.channel_id, interaction.user)
     await interaction.followup.send(response["message"])
 
 @tree.command(name="search")
