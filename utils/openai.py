@@ -16,7 +16,6 @@ async def get_completion(prompt, channelId, userId, system=None, history=None):
             "Helicone-Auth": "Bearer " + helicone_api_key,
             "Helicone-User-Id": str(userId),
             "Helicone-Property-Channel": str(channelId),
-            "Helicone-Property-User": str(userId),
              "Helicone-Cache-Enabled": "true",
         },
         # model="gpt-3.5-turbo",
