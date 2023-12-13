@@ -43,8 +43,10 @@ async def get_thread_history(channel):
 # --------
 
 @tree.command(name="test")
-async def test(interaction):
-    await get_thread_history(interaction.channel)
+@app_commands.describe(input="fala ai")
+async def test(interaction, input: str):
+    # await get_thread_history(interaction.channel)
+    await utils.push()
     await interaction.followup.send('oi')
 
 
