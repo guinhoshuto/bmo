@@ -49,6 +49,15 @@ async def test(interaction, input: str):
     await utils.push()
     await interaction.followup.send('oi')
 
+@tree.command(name="mistral")
+@app_commands.describe(prompt="fala ai", model="modelo")
+async def test(interaction, prompt: str, model:str = "mistral-medium"):
+    await interaction.response.defer(thinking=True)
+    # await get_thread_history(interaction.channel)
+    response = await utils.get_mistral_completion(prompt, model)
+    await interaction.followup.send(f"**Prompt**: {prompt}")
+    await interaction.followup.send(response["choices"][0]["message"]["content"])
+
 
 @tree.command(name="gpt")
 @app_commands.describe(prompt="fala ai", system="quem vc pensa que é?")
