@@ -6,6 +6,8 @@ tags:
   - python
 ---
 
+run `uvicorn main:app --reload --port 5000`
+
 # FastAPI Example
 
 This example starts up a [FastAPI](https://fastapi.tiangolo.com/) server.

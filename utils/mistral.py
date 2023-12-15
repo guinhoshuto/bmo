@@ -25,5 +25,9 @@ async def get_mistral_completion(prompt, model):
             ] 
         }
     )
-    print(completion.text, completion.json())
-    return completion.json()
+    tmp = completion.json()
+    response = {
+        "message": tmp["choices"][0]["message"]["content"],
+        "tokens": tmp["usage"]["total_tokens"]
+    }
+    return response

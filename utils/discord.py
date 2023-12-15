@@ -56,7 +56,8 @@ async def test(interaction, prompt: str, model:str = "mistral-medium"):
     # await get_thread_history(interaction.channel)
     response = await utils.get_mistral_completion(prompt, model)
     await interaction.followup.send(f"**Prompt**: {prompt}")
-    await interaction.followup.send(response["choices"][0]["message"]["content"])
+    for msg in utils.split_text(response["message"]):
+        await interaction.followup.send(msg)
 
 
 @tree.command(name="gpt")
@@ -70,7 +71,8 @@ async def gpt(interaction, prompt:str, system: str = None):
     print(history)
     response = await utils.get_completion(prompt, interaction.channel_id, interaction.user, system=system, history=history) 
     await interaction.followup.send(f"**Prompt**: {prompt}")
-    await interaction.followup.send(response["message"])
+    for msg in utils.split_text(response["message"]):
+        await interaction.followup.send(msg)
 
 @tree.command(name="babel")
 @app_commands.describe(prompt="diga lá", lang="english or japanese", mood="in a ... way")
