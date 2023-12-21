@@ -27,7 +27,13 @@ async def on_ready():
 @bmo.event
 async def on_message(message):
     print(f'Message from {message.author}: {message.content}')
-
+    if message.attachments:
+        for attachment in message.attachments:
+            print(attachment.content_type)
+            if attachment.content_type.startswith('image'):
+                img_suggestions = await utils.get_image_suggestions(message)
+                print(img_suggestions)
+                await message.channel.send(img_suggestions)
 
 async def run_bot():
     await bmo.start(os.getenv('DISCORD_TOKEN'))
@@ -48,6 +54,14 @@ async def test(interaction, input: str):
     # await get_thread_history(interaction.channel)
     await utils.push()
     await interaction.followup.send('oi')
+
+@tree.command(name="gemini")
+@app_commands.describe(input="fala ai")
+async def test(interaction, input: str):
+    await interaction.response.defer(thinking=True)
+    # await get_thread_history(interaction.channel)
+    msg = await utils.get_gemini_completion(input)
+    await interaction.followup.send(msg)
 
 @tree.command(name="mistral")
 @app_commands.describe(prompt="fala ai", model="modelo")
