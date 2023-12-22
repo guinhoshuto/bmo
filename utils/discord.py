@@ -27,16 +27,28 @@ async def on_ready():
 @bmo.event
 async def on_message(message):
     print(f'Message from {message.author}: {message.content}')
+    if message.author.bot:
+        return
     if message.attachments:
         for attachment in message.attachments:
             print(attachment.content_type)
             if attachment.content_type.startswith('image'):
+                reply = await loadingMsg(message)
                 img_suggestions = await utils.get_image_suggestions(message)
-                print(img_suggestions)
-                await message.channel.send(img_suggestions)
+                await reply.delete()
+                for msg in utils.split_text(img_suggestions):
+                    await message.channel.send(msg)
+                # await message.channel.send(img_suggestions)
 
 async def run_bot():
     await bmo.start(os.getenv('DISCORD_TOKEN'))
+
+async def loadingMsg(msg):
+    with open('assets/thinking.gif', 'rb') as f:
+        picture = discord.File(f)
+    loading = await msg.channel.send(file=picture)
+    return loading
+
 
 async def get_thread_history(channel):
     history = []
@@ -51,7 +63,6 @@ async def get_thread_history(channel):
 @tree.command(name="test")
 @app_commands.describe(input="fala ai")
 async def test(interaction, input: str):
-    # await get_thread_history(interaction.channel)
     await utils.push()
     await interaction.followup.send('oi')
 
@@ -59,7 +70,6 @@ async def test(interaction, input: str):
 @app_commands.describe(input="fala ai")
 async def test(interaction, input: str):
     await interaction.response.defer(thinking=True)
-    # await get_thread_history(interaction.channel)
     msg = await utils.get_gemini_completion(input)
     await interaction.followup.send(msg)
 
@@ -67,7 +77,6 @@ async def test(interaction, input: str):
 @app_commands.describe(prompt="fala ai", model="modelo")
 async def test(interaction, prompt: str, model:str = "mistral-medium"):
     await interaction.response.defer(thinking=True)
-    # await get_thread_history(interaction.channel)
     response = await utils.get_mistral_completion(prompt, model)
     await interaction.followup.send(f"**Prompt**: {prompt}")
     for msg in utils.split_text(response["message"]):

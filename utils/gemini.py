@@ -65,5 +65,5 @@ async def get_gemini_vision_completion(img_parts, prompt):
         img_parts[0]
     ]
     response = vision.generate_content(prompt_parts)
-    print('chegou aqui')
+    print(response.text)
     return response.text
