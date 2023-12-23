@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from discord import getCompletion
+import utils
 
 router = APIRouter()
 route = "/discord/"
@@ -7,5 +7,5 @@ route = "/discord/"
 
 @router.get(route)
 async def hello():
-    getCompletion('uai')
+    utils.send_completion('uai')
     return 'oi'

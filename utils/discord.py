@@ -26,9 +26,9 @@ async def on_ready():
     except Exception as e:
         print("não cadastrou nenhum comando")
 
-async def getCompletion(input): 
+async def send_completion(input): 
     channel = bmo.get_channel(channel_geral)
-    await channel.send('oi')
+    await channel.send(input)
 
 
 @bmo.event
