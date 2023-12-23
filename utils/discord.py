@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+channel_geral = 701502306545434807
+
 intents = discord.Intents.all()
 intents.message_content = True
 intents.members = True
@@ -23,6 +25,11 @@ async def on_ready():
         print(f"Synced {len(synced)} commands")
     except Exception as e:
         print("não cadastrou nenhum comando")
+
+async def getCompletion(input): 
+    channel = bmo.get_channel(channel_geral)
+    await channel.send('oi')
+
 
 @bmo.event
 async def on_message(message):
