@@ -26,9 +26,10 @@ async def on_ready():
     except Exception as e:
         print("não cadastrou nenhum comando")
 
-async def send_completion(input): 
+async def send_completion(prompt, api): 
     channel = bmo.get_channel(channel_geral)
-    await channel.send(input)
+    response = await utils.get_completion(prompt, channel_geral, 'shortcuts') 
+    await channel.send(response["message"])
 
 
 @bmo.event
