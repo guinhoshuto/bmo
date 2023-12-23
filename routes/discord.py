@@ -7,5 +7,5 @@ route = "/discord/"
 
 @router.get(route)
 async def hello():
-    utils.send_completion('uai')
+    await utils.send_completion('uai')
     return 'oi'
