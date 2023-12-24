@@ -29,7 +29,9 @@ async def on_ready():
 async def send_completion(prompt, api): 
     channel = bmo.get_channel(channel_geral)
     response = await utils.get_completion(prompt, channel_geral, 'shortcuts') 
-    await channel.send(response["message"])
+    await channel.send('**prompt**: ' + prompt)
+    for msg in utils.split_text(response["message"]):
+        await channel.send(msg)
 
 
 @bmo.event
