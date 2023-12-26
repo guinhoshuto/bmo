@@ -33,10 +33,13 @@ def get_message(prompt, system=None, history=None):
     messages = []
     if history:
         print('---history---')
-        print(history)
+        for h in history:
+            print(h["is_bot"])
+            messages.append({"role": "system" if h["is_bot"] else "user", "content": h["content"]})
     if system:
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
+    print(messages)
     return messages
 
 

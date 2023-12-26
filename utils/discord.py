@@ -36,9 +36,12 @@ async def send_completion(prompt, api):
 
 @bmo.event
 async def on_message(message):
+    print(message.channel.id)
     print(f'Message from {message.author}: {message.content}')
     if message.author.bot:
         return
+    if message.channel.type.name == 'public_thread':
+        await handle_thread_chat(message)
     if message.attachments:
         for attachment in message.attachments:
             print(attachment.content_type)
@@ -59,11 +62,17 @@ async def loadingMsg(msg):
     loading = await msg.channel.send(file=picture)
     return loading
 
+async def handle_thread_chat(msg):
+    history = await get_thread_history(msg.channel)
+    print(history)
+    response = await utils.get_completion(history[-1]["content"], msg.channel.id, 'threads', system=None, history=history)
+    for msg in utils.split_text(response["message"]):
+        await msg.channel.send(msg)
 
 async def get_thread_history(channel):
     history = []
     async for message in channel.history(limit=100):
-        history.append(message.content)
+        history.insert(0, {"is_bot": message.author.bot, "content": message.content})
     return history
 
 # --------
