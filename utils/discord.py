@@ -64,10 +64,10 @@ async def loadingMsg(msg):
 
 async def handle_thread_chat(msg):
     history = await get_thread_history(msg.channel)
-    print(history)
     response = await utils.get_completion(history[-1]["content"], msg.channel.id, 'threads', system=None, history=history)
-    for msg in utils.split_text(response["message"]):
-        await msg.channel.send(msg)
+    print(response)
+    for m in utils.split_text(response["message"]):
+        await msg.channel.send(m)
 
 async def get_thread_history(channel):
     history = []
