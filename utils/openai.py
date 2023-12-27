@@ -1,5 +1,5 @@
 import os
-import openai
+from helicone.openai_proxy import openai
 from dotenv import load_dotenv
 from rich import print
 
@@ -7,7 +7,7 @@ load_dotenv()
 
 helicone_api_key = os.getenv('HELICONE_API_KEY')
 openai.api_key = os.getenv('OPENAI_API_KEY')
-openai.api_base = "https://oai.hconeai.com/v1"
+# openai.api_base = "https://oai.hconeai.com/v1"
 
 async def get_completion(prompt, channelId, userId, system=None, history=None):
     print(channelId, userId)
