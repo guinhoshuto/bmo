@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 channel_geral = 701502306545434807
+kao_error = '𖦹 ´ ᯅ ` 𖦹'
 
 intents = discord.Intents.all()
 intents.message_content = True
@@ -38,6 +39,8 @@ async def send_completion(prompt, api):
 async def on_message(message):
     print(message.channel.id)
     print(f'Message from {message.author}: {message.content}')
+    if message.content == '(´･_ ･`)':
+        return
     if message.author.bot:
         return
     if message.channel.type.name == 'public_thread':
@@ -57,15 +60,17 @@ async def run_bot():
     await bmo.start(os.getenv('DISCORD_TOKEN'))
 
 async def loadingMsg(msg):
-    with open('assets/thinking.gif', 'rb') as f:
+    with open('assets/loading.gif', 'rb') as f:
         picture = discord.File(f)
     loading = await msg.channel.send(file=picture)
     return loading
 
 async def handle_thread_chat(msg):
     history = await get_thread_history(msg.channel)
+    loading = await loadingMsg(msg)
     response = await utils.get_completion(history[-1]["content"], msg.channel.id, 'threads', system=None, history=history)
-    print(response)
+
+    await loading.delete()
     for m in utils.split_text(response["message"]):
         await msg.channel.send(m)
 
