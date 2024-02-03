@@ -3,7 +3,9 @@ import discord
 from discord import app_commands
 import asyncio
 import utils
+import json
 from rich import print
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -145,6 +147,15 @@ async def search(interaction, search: str):
     print(response["items"])
     await interaction.followup.send(response["message"])
     # await interaction.followup.send(view=view)
+
+@tree.command(name="http")
+@app_commands.describe(url="url")
+async def search(interaction, url: str):
+    await interaction.response.defer(thinking=True)
+    response = requests.get(url)
+    print(response.json())
+    await interaction.followup.send(f'```json\n{json.dumps(response.json(), sort_keys=True, indent=2, separators=(",", ": "))} ```')
+    
 
 
 
