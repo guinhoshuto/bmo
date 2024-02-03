@@ -2,6 +2,7 @@ import requests
 import json
 import discord
 import io
+from os import path
 from rich import print
 from bs4 import BeautifulSoup
 
@@ -28,11 +29,11 @@ async def http_request(url, method='GET'):
         case "application":
             json_data = f'```json\n{json.dumps(response.json(), sort_keys=True, indent=2, separators=(",", ": "))} ```'
             if(len(json_data) > 1950):
-                filename = "tmp/response.json"
-                with open(filename, 'w') as f:
+                file = path.join("tmp", "response.json")
+                with open(file, 'w') as f:
                     f.write(json.dumps(response.json()))
 
-                with open(filename, 'rb') as f:
+                with open(file, 'rb') as f:
                     file = discord.File(f)
 
                 is_file = True
@@ -42,7 +43,8 @@ async def http_request(url, method='GET'):
                 message = json_data
 
         case "text":
-            filename = f'tmp/text.{response_type[1]}'
+            filename = f'/tmp/text.{response_type[1]}'
+            file = path.join("tmp", f'text,{response_type[1]}')
             with open(filename, 'w') as f:
                 f.write(response.text)
 
