@@ -153,7 +153,7 @@ async def search(interaction, search: str):
 async def search(interaction, url: str):
     await interaction.response.defer(thinking=True)
     response = await utils.http_request(url)
-    print(response)
+    
     if(response.get("is_file")):
         await interaction.followup.send(file=response.get("message"))
     else: 
