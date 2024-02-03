@@ -152,10 +152,13 @@ async def search(interaction, search: str):
 @app_commands.describe(url="url")
 async def search(interaction, url: str):
     await interaction.response.defer(thinking=True)
-    response = requests.get(url)
-    print(response.json())
-    await interaction.followup.send(f'```json\n{json.dumps(response.json(), sort_keys=True, indent=2, separators=(",", ": "))} ```')
+    response = await utils.http_request(url)
+    print(response)
+    if(response.get("is_file")):
+        await interaction.followup.send(file=response.get("message"))
+    else: 
+        await interaction.followup.send(response.get("message"))
     
-
+ 
 
 

@@ -4,6 +4,7 @@ from utils.google_custom_search import *
 from utils.pushcut import *
 from utils.mistral import *
 from utils.gemini import *
+from utils.http import *
 
 def split_text(text, max_length=2000):
     # Check if the text is shorter than the max_length
