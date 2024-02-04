@@ -29,12 +29,13 @@ async def http_request(url, method='GET'):
         case "application":
             json_data = f'```json\n{json.dumps(response.json(), sort_keys=True, indent=2, separators=(",", ": "))} ```'
             if(len(json_data) > 1950):
-                filename = path.join("tmp", "response.json")
+                # filename = path.join("tmp", "response.json")
+                filename = '/tmp/response.json'
                 with open(filename, 'w') as f:
                     f.write(json.dumps(response.json()))
 
                 with open(filename, 'rb') as f:
-                    file = discord.File(f)
+                    file = discord.File(f, f'response.json')
 
                 is_file = True
                 message = file

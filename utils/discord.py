@@ -45,6 +45,8 @@ async def on_message(message):
         return
     if message.author.bot:
         return
+    if message.channel.id == 1203547736792764416:
+        utils.handleHevyWorkout(message.content)
     if message.channel.type.name == 'public_thread':
         await handle_thread_chat(message)
     if message.attachments:
