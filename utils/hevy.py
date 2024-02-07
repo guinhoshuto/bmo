@@ -2,7 +2,7 @@ import utils
 import os
 sheet = "workouts"
 
-async def handleHevyWorkout(log):
+def handleHevyWorkout(log):
     lines = log.splitlines()
     workout_name = lines[0]
     date = lines[1]
@@ -12,7 +12,11 @@ async def handleHevyWorkout(log):
     for i in workouts:
         if(i.startswith('Série')): 
             print(workout, i)
-            await utils.appendRow(os.getenv("HEVY_SHEETS_ID"), sheet, ["as", "b"]) 
+            utils.appendRow(
+                os.getenv("HEVY_SHEETS_ID"), 
+                sheet, 
+                [date, workout_name, workout, i, url]
+            ) 
         if(i == ""):
             print('próximo exercicio')
         else:

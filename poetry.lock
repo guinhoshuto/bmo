@@ -603,6 +603,25 @@ google-auth = "*"
 httplib2 = ">=0.19.0"
 
 [[package]]
+name = "google-auth-oauthlib"
+version = "1.2.0"
+description = "Google Authentication Library"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "google-auth-oauthlib-1.2.0.tar.gz", hash = "sha256:292d2d3783349f2b0734a0a0207b1e1e322ac193c2c09d8f7c613fb7cc501ea8"},
+    {file = "google_auth_oauthlib-1.2.0-py2.py3-none-any.whl", hash = "sha256:297c1ce4cb13a99b5834c74a1fe03252e1e499716718b190f56bcb9c4abc4faf"},
+]
+
+[package.dependencies]
+google-auth = ">=2.15.0"
+requests-oauthlib = ">=0.7.0"
+
+[package.extras]
+tool = ["click (>=6.0.0)"]
+
+[[package]]
 name = "google-generativeai"
 version = "0.3.2"
 description = "Google Generative AI High level API client library and tools."
@@ -1473,4 +1492,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "8172bab33d5b419e7b0231ba9e088387d869946b95c63cd8004c0bbf2a9f8ab7"
+content-hash = "f115681bee54f99489c6eb0b9e568bc173765b30e6789474f0834e16004ad22c"
