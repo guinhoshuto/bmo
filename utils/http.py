@@ -39,6 +39,7 @@ async def http_request(url, method='GET', body=None, params=None, header=None):
         settings['params'] = parse_params(params)
     if(header):
         settings['headers'] = parse_params(header)
+    print(settings)
     response = requests.request(method, url=url, data=settings)
     response_type = response.headers.get("content-type").split(";")[0].split("/")
     print(response_type)
