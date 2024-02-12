@@ -9,8 +9,10 @@ from bs4 import BeautifulSoup
 unwanted_tags = ['script', 'style', 'meta']
 content_tags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li']
 
-def get_content(url):
-    response = requests.get(url)
+def get_content(url, method, body=None, params=None):
+    # response = requests.get(url)
+    print('oioioi')
+    response = requests(method, url=url)
     main_content = ''
     soup = BeautifulSoup(response.content, 'html.parser') 
     for tag in unwanted_tags:
@@ -21,8 +23,9 @@ def get_content(url):
     print(main_content)
     return main_content
 
-async def http_request(url, method='GET'):
-    response = requests.get(url)
+async def http_request(url, method='GET', body=None, params=None):
+    print(url, method, body, params)
+    response = requests.request(method, url=url)
     response_type = response.headers.get("content-type").split(";")[0].split("/")
     print(response_type)
     match response_type[0]:
@@ -71,3 +74,6 @@ async def http_request(url, method='GET'):
         "is_file": is_file,
         "message": message
     }
+
+def parse_body(body):
+    attr = body.split(",")
