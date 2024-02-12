@@ -151,15 +151,15 @@ async def search(interaction, search: str):
     # await interaction.followup.send(view=view)
 
 @tree.command(name="http")
-@app_commands.describe(url="url", body="body", params="Url Params")
+@app_commands.describe(url="url", body="body", params="Url Params", header="Headers")
 @app_commands.choices(method=[
     app_commands.Choice(name="GET", value="GET"),
     app_commands.Choice(name="POST", value="POST"),
     app_commands.Choice(name="PUT", value="PUT")
 ])
-async def search(interaction, method: app_commands.Choice[str], url: str, body: str = None, params: str = None):
+async def search(interaction, method: app_commands.Choice[str], url: str, body: str = None, params: str = None, header: str = None):
     await interaction.response.defer(thinking=True)
-    response = await utils.http_request(url, method.value, body, params)
+    response = await utils.http_request(url, method.value, body, params, header)
     
     if(response.get("is_file")):
         await interaction.followup.send(file=response.get("message"))

@@ -1,4 +1,6 @@
 import requests
+import logging
+import http.client as http_client
 import json
 import discord
 import io
@@ -6,12 +8,17 @@ from os import path
 from rich import print
 from bs4 import BeautifulSoup
 
+logging.basicConfig()
+logging.getLogger().setLevel(logging.DEBUG)
+requests_log = logging.getLogger("requests.packages.urllib3")
+requests_log.setLevel(logging.DEBUG)
+requests_log.propagate = True
+
 unwanted_tags = ['script', 'style', 'meta']
 content_tags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li']
 
 def get_content(url, method, body=None, params=None):
     # response = requests.get(url)
-    print('oioioi')
     response = requests(method, url=url)
     main_content = ''
     soup = BeautifulSoup(response.content, 'html.parser') 
@@ -23,9 +30,16 @@ def get_content(url, method, body=None, params=None):
     print(main_content)
     return main_content
 
-async def http_request(url, method='GET', body=None, params=None):
+async def http_request(url, method='GET', body=None, params=None, header=None):
     print(url, method, body, params)
-    response = requests.request(method, url=url)
+    settings = {}
+    if(body):
+        settings['data'] = json.dumps(parse_params(body))
+    if(params):
+        settings['params'] = parse_params(params)
+    if(header):
+        settings['headers'] = parse_params(header)
+    response = requests.request(method, url=url, data=settings)
     response_type = response.headers.get("content-type").split(";")[0].split("/")
     print(response_type)
     match response_type[0]:
@@ -75,5 +89,11 @@ async def http_request(url, method='GET', body=None, params=None):
         "message": message
     }
 
-def parse_body(body):
-    attr = body.split(",")
+def parse_params(params):
+    attributes = {}
+    attrs = str(params).split(",")
+    for attr in attrs:
+        print(attr)
+        tmp = attr.split("=")
+        attributes[tmp[0]] = tmp[1]
+    return attributes
