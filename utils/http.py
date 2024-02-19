@@ -7,11 +7,12 @@ import io
 from os import path
 from rich import print
 from bs4 import BeautifulSoup
+from pprint import pformat
 
 logging.basicConfig()
 logging.getLogger().setLevel(logging.DEBUG)
 requests_log = logging.getLogger("requests.packages.urllib3")
-requests_log.setLevel(logging.DEBUG)
+
 requests_log.propagate = True
 
 unwanted_tags = ['script', 'style', 'meta']
