@@ -35,8 +35,8 @@ vision = ChatGoogleGenerativeAI(model="gemini-2.0-flash-exp",
                             api_key=os.getenv('GEMINI_API_KEY'))
 
 async def get_gemini_completion(prompt):
-    response = llm.generate_content(prompt)
-    return response.text
+    response = llm.invoke(prompt)
+    return response.content
 
 async def format_img_parts(att):
     response = requests.get(att.url)
