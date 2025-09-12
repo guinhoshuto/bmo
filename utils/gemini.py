@@ -1,7 +1,7 @@
 import os
 from io import BytesIO
 import requests
-import google.generativeai as genai
+from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -26,11 +26,13 @@ safety_settings = [
 ]
 
 
-genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
-llm = genai.GenerativeModel(model_name="gemini-pro",
-                            safety_settings=safety_settings)
-vision = genai.GenerativeModel(model_name='gemini-pro-vision',
-                            safety_settings=safety_settings)
+llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash",
+                            temperature=0,
+                            api_key=os.getenv('GEMINI_API_KEY'))
+
+vision = ChatGoogleGenerativeAI(model="gemini-2.0-flash-exp",
+                            temperature=0,
+                            api_key=os.getenv('GEMINI_API_KEY'))
 
 async def get_gemini_completion(prompt):
     response = llm.generate_content(prompt)
