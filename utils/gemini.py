@@ -1,7 +1,7 @@
 import os
 from io import BytesIO
 import requests
-from langchain_google_genai import ChatGoogleGenerativeAI
+import google.generativeai as genai
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -26,33 +26,48 @@ safety_settings = [
 ]
 
 
-llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash",
-                            temperature=0,
-                            api_key=os.getenv('GEMINI_API_KEY'))
+# Configure the API key
+genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 
-vision = ChatGoogleGenerativeAI(model="gemini-2.0-flash-exp",
-                            temperature=0,
-                            api_key=os.getenv('GEMINI_API_KEY'))
+# Initialize models with safety settings
+llm = genai.GenerativeModel(
+    model_name="gemini-1.5-flash",
+    safety_settings=safety_settings,
+    generation_config=genai.types.GenerationConfig(
+        temperature=0,
+        max_output_tokens=8192,
+    )
+)
+
+vision = genai.GenerativeModel(
+    model_name="gemini-1.5-flash",
+    safety_settings=safety_settings,
+    generation_config=genai.types.GenerationConfig(
+        temperature=0,
+        max_output_tokens=8192,
+    )
+)
 
 async def get_gemini_completion(prompt):
-    response = llm.invoke(prompt)
-    return response.content
+    response = llm.generate_content(prompt)
+    return response.text
 
 async def format_img_parts(att):
     response = requests.get(att.url)
     if response.status_code == 200:
-        return [
-            {
-                "mime_type": att.content_type,
-                "data": BytesIO(response.content).getvalue()
-            },
-        ]
+        return {
+            "mime_type": att.content_type,
+            "data": response.content
+        }
     else: 
-        return []
+        return None
 
 
 async def get_image_suggestions(msg):
     img_parts = await format_img_parts(msg.attachments[0])
+    if img_parts is None:
+        return "Erro ao processar a imagem."
+    
     if msg.content:
         response = await get_gemini_vision_completion(img_parts, msg.content)
         return response
@@ -64,7 +79,7 @@ async def get_image_suggestions(msg):
 async def get_gemini_vision_completion(img_parts, prompt):
     prompt_parts = [
         prompt, 
-        img_parts[0]
+        img_parts
     ]
     response = vision.generate_content(prompt_parts)
     print(response.text)
