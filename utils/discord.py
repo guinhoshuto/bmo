@@ -126,6 +126,7 @@ async def babel(interaction, prompt: str, lang: str = "english", mood: str = "no
             in {lang}. I want you to only reply the correction, \
             the improvements and nothing else, \ 
             do not write explanations and make it in a {mood} way. \ 
+            For every translation you make, make at least 5 versions of the translation.
             My first sentence is ```{prompt}```""", interaction.channel_id, interaction.user)
     await interaction.followup.send(response["message"])
 

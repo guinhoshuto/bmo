@@ -39,18 +39,19 @@ async def get_gemini_completion(prompt):
 async def format_img_parts(att):
     response = requests.get(att.url)
     if response.status_code == 200:
-        return [
-            {
-                "mime_type": att.content_type,
-                "data": BytesIO(response.content).getvalue()
-            },
-        ]
+        return {
+            "mime_type": att.content_type,
+            "data": response.content
+        }
     else: 
-        return []
+        return None
 
 
 async def get_image_suggestions(msg):
     img_parts = await format_img_parts(msg.attachments[0])
+    if img_parts is None:
+        return "Erro ao processar a imagem."
+    
     if msg.content:
         response = await get_gemini_vision_completion(img_parts, msg.content)
         return response
@@ -62,7 +63,7 @@ async def get_image_suggestions(msg):
 async def get_gemini_vision_completion(img_parts, prompt):
     prompt_parts = [
         prompt, 
-        img_parts[0]
+        img_parts
     ]
     response = client.models.generate_content(
         model="gemini-pro-vision",
