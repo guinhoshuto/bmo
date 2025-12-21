@@ -6,7 +6,6 @@ aiosignal==1.4.0
 annotated-types==0.7.0
 anyio==4.10.0
 attrs==25.3.0
-audioop-lts==0.2.2
 beautifulsoup4==4.13.5
 cachetools==5.5.2
 certifi==2025.8.3
