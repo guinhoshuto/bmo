@@ -1,7 +1,7 @@
 import os
 from io import BytesIO
 import requests
-import google.generativeai as genai
+import google.genai as genai
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -26,14 +26,14 @@ safety_settings = [
 ]
 
 
-genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
-llm = genai.GenerativeModel(model_name="gemini-pro",
-                            safety_settings=safety_settings)
-vision = genai.GenerativeModel(model_name='gemini-pro-vision',
-                            safety_settings=safety_settings)
+client = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
 
 async def get_gemini_completion(prompt):
-    response = llm.generate_content(prompt)
+    response = client.models.generate_content(
+        model="gemini-pro",
+        contents=prompt,
+        safety_settings=safety_settings
+    )
     return response.text
 
 async def format_img_parts(att):
@@ -64,6 +64,10 @@ async def get_gemini_vision_completion(img_parts, prompt):
         prompt, 
         img_parts[0]
     ]
-    response = vision.generate_content(prompt_parts)
+    response = client.models.generate_content(
+        model="gemini-pro-vision",
+        contents=prompt_parts,
+        safety_settings=safety_settings
+    )
     print(response.text)
     return response.text

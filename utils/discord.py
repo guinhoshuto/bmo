@@ -48,7 +48,9 @@ async def on_message(message):
     if message.channel.id == 1203547736792764416:
         utils.handleHevyWorkout(message.content)
     if message.channel.type.name == 'public_thread':
-        await handle_thread_chat(message)
+        response = await utils.get_agent_response(message.content, message.channel.id)
+        await message.channel.send(response["message"])
+        # await handle_thread_chat(message)
     if message.attachments:
         for attachment in message.attachments:
             print(attachment.content_type)
@@ -69,20 +71,6 @@ async def loadingMsg(msg):
     loading = await msg.channel.send(file=picture)
     return loading
 
-async def handle_thread_chat(msg):
-    history = await get_thread_history(msg.channel)
-    loading = await loadingMsg(msg)
-    response = await utils.get_completion(history[-1]["content"], msg.channel.id, 'threads', system=None, history=history)
-
-    await loading.delete()
-    for m in utils.split_text(response["message"]):
-        await msg.channel.send(m)
-
-async def get_thread_history(channel):
-    history = []
-    async for message in channel.history(limit=100):
-        history.insert(0, {"is_bot": message.author.bot, "content": message.content})
-    return history
 
 # --------
 # commands

@@ -6,6 +6,7 @@ from utils.mistral import *
 from utils.gemini import *
 from utils.http import *
 from utils.hevy import *
+from utils.agent import *
 from utils.sheets import *
 
 def split_text(text, max_length=2000):
