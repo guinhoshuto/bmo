@@ -34,3 +34,24 @@ async def get_agent_response(prompt: str, thread_id: str) -> dict:
         message_content = str(result)
     
     return {"message": message_content}
+
+async def optimize_prompt(prompt: str) -> str:
+    system_message = """
+    You are an expert prompt optimizer. Improve the following prompt to be more clear and effective for an AI language model.
+    Expand scope—what did they mean but not say? Include all relevant details.
+    Expand the context—what background information do they need to know? Include all relevant details.
+    Expand the task—what is the specific task they want the AI to perform? Include all relevant details.
+    Expand the output—what is the specific output they want the AI to produce? Include all relevant details.
+    Expand the format—what is the specific format they want the AI to produce? Include all relevant details.
+    Expand the language—what is the specific language they want the AI to produce? Include all relevant details.
+    Expand the tone—what is the specific tone they want the AI to produce? Include all relevant details.
+    Expand the style—what is the specific style they want the AI to produce? Include all relevant details.
+    """
+    result = await agent.ainvoke(
+        {"messages": [
+            SystemMessage(content=system_message),
+            HumanMessage(content=prompt)
+        ]},
+        {"configurable": {"thread_id": thread_id}}
+    )
+    return result["messages"][-1].content

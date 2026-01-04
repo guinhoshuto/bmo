@@ -27,6 +27,7 @@ async def on_ready():
         synced = await tree.sync()
         print(f"Synced {len(synced)} commands")
     except Exception as e:
+        print(f"Error syncing commands: {e}")
         print("não cadastrou nenhum comando")
 
 async def send_completion(prompt, api): 
@@ -81,6 +82,13 @@ async def loadingMsg(msg):
 async def test(interaction, input: str):
     await utils.push()
     await interaction.followup.send('oi')
+
+@tree.command(name="optimize")
+@app_commands.describe(prompt="optimize this prompt")
+async def optimize(interaction, prompt: str):
+    await interaction.response.defer(thinking=True)
+    optimized_prompt = await utils.optimize_prompt(prompt)
+    await interaction.followup.send(optimized_prompt)
 
 @tree.command(name="gemini")
 @app_commands.describe(input="fala ai")
@@ -146,7 +154,7 @@ async def search(interaction, search: str):
     app_commands.Choice(name="POST", value="POST"),
     app_commands.Choice(name="PUT", value="PUT")
 ])
-async def search(interaction, method: app_commands.Choice[str], url: str, body: str = None, params: str = None, header: str = None):
+async def http(interaction, method: app_commands.Choice[str], url: str, body: str = None, params: str = None, header: str = None):
     await interaction.response.defer(thinking=True)
     response = await utils.http_request(url, method.value, body, params, header)
     
@@ -154,4 +162,20 @@ async def search(interaction, method: app_commands.Choice[str], url: str, body: 
         await interaction.followup.send(file=response.get("message"))
     else: 
         await interaction.followup.send(response.get("message"))
+
+@tree.command(name="sync")
+@app_commands.describe(guild_id="Guild ID to sync to (leave empty for global sync)")
+async def sync(interaction, guild_id: str = None):
+    """Manually sync slash commands"""
+    await interaction.response.defer(ephemeral=True)
+    try:
+        if guild_id:
+            guild = discord.Object(id=int(guild_id))
+            synced = await tree.sync(guild=guild)
+            await interaction.followup.send(f"Synced {len(synced)} commands to guild {guild_id}", ephemeral=True)
+        else:
+            synced = await tree.sync()
+            await interaction.followup.send(f"Synced {len(synced)} commands globally", ephemeral=True)
+    except Exception as e:
+        await interaction.followup.send(f"Error syncing commands: {str(e)}", ephemeral=True)
     
