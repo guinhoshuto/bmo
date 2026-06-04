@@ -4,6 +4,7 @@ from discord import app_commands
 import asyncio
 import utils
 import json
+import io
 from rich import print
 import requests
 from dotenv import load_dotenv
@@ -19,6 +20,55 @@ intents.members = True
 
 bmo = discord.Client(intents=intents)
 tree = app_commands.CommandTree(bmo)
+
+
+async def require_discord_admin(interaction: discord.Interaction) -> bool:
+    permissions = getattr(interaction.user, "guild_permissions", None)
+    if permissions and permissions.administrator:
+        return True
+
+    await interaction.response.send_message(
+        "Este comando requer permissao de administrador.",
+        ephemeral=True,
+    )
+    return False
+
+
+async def send_api_response(
+    interaction: discord.Interaction,
+    title: str,
+    payload,
+    filename: str,
+):
+    content = json.dumps(payload, ensure_ascii=False, indent=2)
+    message = f"**{title}**\n```json\n{content}\n```"
+
+    if len(message) <= 2000:
+        await interaction.followup.send(message, ephemeral=True)
+        return
+
+    file = discord.File(
+        io.BytesIO(content.encode("utf-8")),
+        filename=filename,
+    )
+    await interaction.followup.send(
+        f"**{title}**",
+        file=file,
+        ephemeral=True,
+    )
+
+
+async def send_cacareco_error(interaction: discord.Interaction, error: Exception):
+    if isinstance(error, requests.RequestException):
+        response = getattr(error, "response", None)
+        detail = response.text if response is not None else str(error)
+    else:
+        detail = str(error)
+
+    await interaction.followup.send(
+        f"Erro ao chamar a API Cacareco: {detail[:1500]}",
+        ephemeral=True,
+    )
 
 @bmo.event
 async def on_ready():
@@ -132,8 +182,8 @@ async def babel(interaction, prompt: str, lang: str = "english", mood: str = "no
             It is in brazilian portuguese and you will translate it \
             and answer in the corrected and improved version of my text, \
             in {lang}. I want you to only reply the correction, \
-            the improvements and nothing else, \ 
-            do not write explanations and make it in a {mood} way. \ 
+            the improvements and nothing else, \
+            do not write explanations and make it in a {mood} way. \
             For every translation you make, make at least 5 versions of the translation.
             My first sentence is ```{prompt}```""", interaction.channel_id, interaction.user)
     await interaction.followup.send(response["message"])
@@ -163,6 +213,117 @@ async def http(interaction, method: app_commands.Choice[str], url: str, body: st
     else: 
         await interaction.followup.send(response.get("message"))
 
+@tree.command(name="etsy")
+@app_commands.default_permissions(administrator=True)
+@app_commands.describe(
+    listing_id="ID da listing para consultar",
+    shop_id="ID da loja para listar produtos",
+    estado="Estado das listings da loja",
+    limite="Quantidade de listings da loja, entre 1 e 100",
+    offset="Posicao inicial das listings da loja",
+)
+async def etsy(
+    interaction: discord.Interaction,
+    listing_id: str = None,
+    shop_id: str = None,
+    estado: str = "active",
+    limite: int = 25,
+    offset: int = 0,
+):
+    if not await require_discord_admin(interaction):
+        return
+
+    listing_id = listing_id.strip() if listing_id else None
+    shop_id = shop_id.strip() if shop_id else None
+
+    if bool(listing_id) == bool(shop_id):
+        await interaction.response.send_message(
+            "Informe apenas `listing_id` ou apenas `shop_id`.",
+            ephemeral=True,
+        )
+        return
+    if not 1 <= limite <= 100 or offset < 0:
+        await interaction.response.send_message(
+            "`limite` deve estar entre 1 e 100 e `offset` nao pode ser negativo.",
+            ephemeral=True,
+        )
+        return
+
+    await interaction.response.defer(thinking=True, ephemeral=True)
+
+    try:
+        if listing_id:
+            response = await asyncio.to_thread(utils.get_etsy_listing, listing_id)
+            title = f"Etsy listing {listing_id}"
+        else:
+            response = await asyncio.to_thread(
+                utils.get_etsy_shop_listings,
+                shop_id,
+                state=estado,
+                limit=limite,
+                offset=offset,
+            )
+            title = f"Etsy shop {shop_id}"
+
+        await send_api_response(interaction, title, response, "etsy-response.json")
+    except (utils.CacarecoConfigError, requests.RequestException, ValueError) as error:
+        await send_cacareco_error(interaction, error)
+
+
+@tree.command(name="twitch")
+@app_commands.default_permissions(administrator=True)
+@app_commands.describe(
+    canal="Canal que recebera as mensagens de teste",
+    quantidade="Quantidade de mensagens, entre 1 e 100",
+    intervalo="Intervalo em segundos, entre 0 e 60",
+    mensagem="Mensagem personalizada opcional",
+)
+async def twitch(
+    interaction: discord.Interaction,
+    canal: str = "guinhoshuto",
+    quantidade: int = 8,
+    intervalo: float = 1.5,
+    mensagem: str = None,
+):
+    if not await require_discord_admin(interaction):
+        return
+
+    canal = canal.strip()
+    mensagem = mensagem.strip() if mensagem else None
+
+    if not canal:
+        await interaction.response.send_message(
+            "`canal` nao pode ser vazio.",
+            ephemeral=True,
+        )
+        return
+    if not 1 <= quantidade <= 100 or not 0 <= intervalo <= 60:
+        await interaction.response.send_message(
+            "`quantidade` deve estar entre 1 e 100 e `intervalo` entre 0 e 60.",
+            ephemeral=True,
+        )
+        return
+
+    await interaction.response.defer(thinking=True, ephemeral=True)
+
+    try:
+        response = await asyncio.to_thread(
+            utils.send_twitch_test_messages,
+            channel_username=canal,
+            quantity=quantidade,
+            interval_seconds=intervalo,
+            messages=[mensagem] if mensagem else None,
+        )
+        await send_api_response(
+            interaction,
+            f"Twitch test messages para {canal}",
+            response,
+            "twitch-response.json",
+        )
+    except (utils.CacarecoConfigError, requests.RequestException, ValueError) as error:
+        await send_cacareco_error(interaction, error)
+
+
 @tree.command(name="sync")
 @app_commands.describe(guild_id="Guild ID to sync to (leave empty for global sync)")
 async def sync(interaction, guild_id: str = None):
@@ -178,4 +339,3 @@ async def sync(interaction, guild_id: str = None):
             await interaction.followup.send(f"Synced {len(synced)} commands globally", ephemeral=True)
     except Exception as e:
         await interaction.followup.send(f"Error syncing commands: {str(e)}", ephemeral=True)
-    
