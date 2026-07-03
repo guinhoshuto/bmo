@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 channel_geral = 701502306545434807
+guild_principal = 701502306545434804
 kao_error = '𖦹 ´ ᯅ ` 𖦹'
 
 intents = discord.Intents.all()
@@ -74,8 +75,12 @@ async def send_cacareco_error(interaction: discord.Interaction, error: Exception
 async def on_ready():
     print(f'Logged on as {bmo.user}!')
     try:
+        guild = discord.Object(id=guild_principal)
+        tree.copy_global_to(guild=guild)
+        synced_guild = await tree.sync(guild=guild)
+        print(f"Synced {len(synced_guild)} commands to guild {guild_principal}")
         synced = await tree.sync()
-        print(f"Synced {len(synced)} commands")
+        print(f"Synced {len(synced)} commands globally")
     except Exception as e:
         print(f"Error syncing commands: {e}")
         print("não cadastrou nenhum comando")

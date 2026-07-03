@@ -7,12 +7,20 @@ from tavily import TavilyClient
 
 load_dotenv()
 
-tavily_client = TavilyClient()
+_tavily_client = None
+
+
+def get_tavily_client():
+    global _tavily_client
+    if _tavily_client is None:
+        _tavily_client = TavilyClient()
+    return _tavily_client
+
 
 @tool
 def web_search(query: str) -> str:
     """Search the web for information"""
-    results = tavily_client.search(query)
+    results = get_tavily_client().search(query)
     return results
 
 agent = create_agent(
